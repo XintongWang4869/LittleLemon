@@ -27,11 +27,17 @@ project下的urls.py: url dispatcher
 
 1. Download [MySQL](https://www.mysql.com/downloads/).   
 
-2. Using MYSQL Workbench to start running a local instance.
+2. Using MYSQL Workbench to start running a local instance.     
+    MacOS: 
+    * brew services start/stop mysql
+    * mysql_secure_installation 
+    * mysql -u root -p (log in to MySQL as the root user)
+
+
 
 3. `pip3 install mysqlclient`      
-    如这一步失败，可能需安装 sudo apt install default-libmysqlclient-dev    
-    将 settings.py DATABASES 替换为 MYSQL   
+    如这一步失败，可能需安装 'sudo apt install default-libmysqlclient-dev', 在MacBook中可运行 'brew install mysql'
+    将 settings.py DATABASES 替换为 MYSQL: 注意在WSL2系统中的localhost地址不同   
     常见的MYSQL CLI commands: SHOW DATABASES; USE database_name; SHOW TABLES;
 
 4. Declare models in models.py, and perform makemigrations & migrations. The corresponding tables will be created in the database (which can be confirmed by CLI or vscode extensions).
@@ -45,7 +51,7 @@ Optionally: Create superuser with `python manage.py createsuperuser`; add data u
 
 1. `pip3 install djangorestframework`
 
-> Django REST Framework (DRF) serializes the view response into JSON format and returns it to the client. Recall that the process of serialization involves converting the model instances to native Python datatypes so that they can be rendered into JSON format. 
+> Django REST Framework (DRF) serializes the view response into JSON format and returns it to the client. Recall that the process of _serialization_ involves converting the model instances (complex data) to **native** Python datatypes (JSON or XML) so that they can be rendered into JSON format. 
 
 Deserialization parses the data back into the model instance after first validating the incoming data.
 
