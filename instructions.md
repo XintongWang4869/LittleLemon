@@ -15,10 +15,10 @@ project下的urls.py: url dispatcher
 2. 创建并进入虚拟环境，安装 `django-admin`
 
 
-3. `django-admin startproject littlelemon`  
+3. 创建project: `django-admin startproject littlelemon .`  
     查看是否正常运行 cd littlelemon && python3 manage.py runserver
 
-4. `python3 manage.py startapp restaurant`   
+4. 在project中创建app: `python3 manage.py startapp restaurant`   
     add the app to **INSTALLED_APPS** in settings.py  
     push to git
 
@@ -40,6 +40,14 @@ project下的urls.py: url dispatcher
 
 Optionally: Create superuser with `python manage.py createsuperuser`; add data using the admin interface
 
+
+### REST APIs
+
+1. `pip3 install djangorestframework`
+
+> Django REST Framework (DRF) serializes the view response into JSON format and returns it to the client. Recall that the process of serialization involves converting the model instances to native Python datatypes so that they can be rendered into JSON format. 
+
+Deserialization parses the data back into the model instance after first validating the incoming data.
 
 
 ## Troubleshooting
