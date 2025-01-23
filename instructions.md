@@ -1,10 +1,12 @@
 
 
-build two APIs. One API to order food using the Menu API. You need to build the Table booking API to facilitate reserving a table for dining in the restaurant on a specific date and for a certain number of people.
+This project has built two REST APIs:
 
-By the end of this project, you will have built REST APIs for ordering food using the Menu API and reserving the table using the Booking API. 
+* The Menu API: used to order food using the 
+* the Table booking API: used to facilitate reserving a table for dining in the restaurant on a specific date and for a certain number of people.
 
-project下的urls.py: url dispatcher
+
+
 
 ## Step-by-Step Guide
 
@@ -24,7 +26,7 @@ project下的urls.py: url dispatcher
 5. Commit and push to git repo.
 
 
-### Models
+### Declare Models
 
 1. On Windows, download [MySQL](https://www.mysql.com/downloads/). Use MYSQL Workbench to start running a local instance. Start MYSQL CLI client to check the running instance (Commonly used commands: SHOW DATABASES; CREATE DATABASE USE database_name; USE database_name; SHOW TABLES;)   
 
@@ -49,7 +51,7 @@ project下的urls.py: url dispatcher
 Optionally: Create superuser with `python manage.py createsuperuser`; add data using the admin interface
 
 
-### REST APIs
+### Build REST APIs
 
 1. `pip3 install djangorestframework`
 
@@ -66,14 +68,23 @@ Optionally: Create superuser with `python manage.py createsuperuser`; add data u
 > * viewsets
 >   * Can handle GET, POST, PUT and DELETE requests.
 
+
 2. Add `rest_framework` to INSTALLED_APPS in "settings.py". 
 
-3. Create **"serializers.py"** file in the app folder (import rest_framework.serializers).
 
-4. Develop views for the API in **views.py**: using class-based views here as example.  
+3. Create **"serializers.py"** file in the app folder (from rest_framework import serializers).     
+    Also need to import models.     
+
+
+4. Develop views for the API in **views.py**: using class-based views here as example.      
+    * For function-based views: return render(request, template, {context}) 
+    * For viewsets/generics: 需定义 **queryset** (指定了视图将操作的model对象集) 如 User.objects.all()，同时也需定义上一步的 **serializer_class**
     
 
-5. Update the URL configuration of the app as well as the project.
+5. Update the URL configuration of the app as well as the project.      
+    注意project下的urls.py，相当于 url dispatcher，可以 include('my_app.urls')
+
+<br>
 
 ## Troubleshooting
 
