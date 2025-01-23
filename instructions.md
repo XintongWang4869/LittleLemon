@@ -16,29 +16,31 @@ project下的urls.py: url dispatcher
 
 
 3. 创建project: `django-admin startproject littlelemon .`  
-    查看是否正常运行 cd littlelemon && python3 manage.py runserver
+    查看是否正常运行 cd littlelemon && python3 manage.py runserver.
 
-4. 在project中创建app: `python3 manage.py startapp restaurant`   
-    add the app to **INSTALLED_APPS** in settings.py  
-    push to git
+4. 在project中创建app: `python3 manage.py startapp restaurant`.   
+    Add the app to **INSTALLED_APPS** in "settings.py".  
+
+5. Commit and push to git repo.
 
 
 ### Models
 
-1. Download [MySQL](https://www.mysql.com/downloads/).   
+1. On Windows, download [MySQL](https://www.mysql.com/downloads/). Use MYSQL Workbench to start running a local instance. Start MYSQL CLI client to check the running instance (Commonly used commands: SHOW DATABASES; CREATE DATABASE USE database_name; USE database_name; SHOW TABLES;)   
 
-2. Using MYSQL Workbench to start running a local instance.     
-    MacOS: 
+    On MacOS: 
+    * brew install mysql
     * brew services start/stop mysql
     * mysql_secure_installation 
     * mysql -u root -p (log in to MySQL as the root user)
 
 
-
-3. `pip3 install mysqlclient`      
-    如这一步失败，可能需安装 'sudo apt install default-libmysqlclient-dev', 在MacBook中可运行 'brew install mysql'
-    将 settings.py DATABASES 替换为 MYSQL: 注意在WSL2系统中的localhost地址不同   
-    常见的MYSQL CLI commands: SHOW DATABASES; USE database_name; SHOW TABLES;
+2. 在项目的虚拟环境中，`pip3 install mysqlclient`.      
+    Windows系统中如这一步失败，可能需安装 'sudo apt install default-libmysqlclient-dev'  
+    
+3. 将 "settings.py" DATABASES 替换为 MYSQL    
+    注意在WSL2系统中的localhost地址不同   
+    
 
 4. Declare models in models.py, and perform makemigrations & migrations. The corresponding tables will be created in the database (which can be confirmed by CLI or vscode extensions).
 
@@ -51,29 +53,47 @@ Optionally: Create superuser with `python manage.py createsuperuser`; add data u
 
 1. `pip3 install djangorestframework`
 
-> Django REST Framework (DRF) serializes the view response into JSON format and returns it to the client. Recall that the process of _serialization_ involves converting the model instances (complex data) to **native** Python datatypes (JSON or XML) so that they can be rendered into JSON format. 
+> **Django REST Framework (DRF)** serializes the view response into JSON format and returns it to the client.  
+> _Serialization_ involves converting the model instances (complex data) to native Python datatypes (JSON or XML) so that they can be rendered into JSON format.  
+> _Deserialization_ parses the data back into the model instance after first validating the incoming data.  
+> DRF views:    
+> * function-based views:   
+>    * Need to provide separate views for each method such as GET, POST, PUT and DELETE.
+> * class-based views   
+> * mixins
+> * generics view classes
+>      * ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView
+> * viewsets
+>   * Can handle GET, POST, PUT and DELETE requests.
 
-Deserialization parses the data back into the model instance after first validating the incoming data.
+2. Add `rest_framework` to INSTALLED_APPS in "settings.py". 
 
+3. Create **"serializers.py"** file in the app folder (import rest_framework.serializers).
+
+4. Develop views for the API in **views.py**: using class-based views here as example.  
+    
+
+5. Update the URL configuration of the app as well as the project.
 
 ## Troubleshooting
 
 MySQL installed in windows whereas django project is in wsl2 (**the following code is less secure**):
 * In MYSQL command line client:
 ```
-CREATE USER 'root'@'%' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+CREATE USER 'root'@'192.168.16.1' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.16.1' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 ```
 
 * In MYSQL configuration file (/etc/mysql/my.cnf), set bind-address to 0.0.0.0 to allow connections from any IP address.
 ```
 [mysqld]
-bind-address = 0.0.0.0
+bind-address = 192.168.16.1
 ```
 
-You can also use `cat /etc/resolv.conf | grep nameserver` to find the IP address of your Windows host (eg. 192.168.16.1).  
-In this case, use the specified address instead of wild card '%', and change bind-address to the specific address.  
+Use `cat /etc/resolv.conf | grep nameserver` to find the IP address of your Windows host (eg. 192.168.16.1).  
+Otherwise, you can also use the wild card '%', and change bind-address to 0.0.0.0.  
+
 But MySQL does not support specifying multiple bind-address values directly in the configuration file. But you can set the bind-address to 0.0.0.0, and use firewall rules to restrict access to specific IP addresses.
 
 
