@@ -2,7 +2,7 @@
 
 This project has built two REST APIs:
 
-* The Menu API: used to order food using the 
+* The Menu API: used to order food 
 * the Table booking API: used to facilitate reserving a table for dining in the restaurant on a specific date and for a certain number of people.
 
 
@@ -28,9 +28,17 @@ This project has built two REST APIs:
 
 ### Declare Models
 
-1. On Windows, download [MySQL](https://www.mysql.com/downloads/). Use MYSQL Workbench to start running a local instance. Start MYSQL CLI client to check the running instance (Commonly used commands: SHOW DATABASES; CREATE DATABASE USE database_name; USE database_name; SHOW TABLES;)   
+1. Install MySQL
 
-    On MacOS: 
+* On Windows, download [MySQL](https://www.mysql.com/downloads/). Use MYSQL Workbench to start running a local instance. Start MYSQL CLI client to check the running instance (Commonly used commands: SHOW DATABASES; CREATE DATABASE USE database_name; USE database_name; SHOW TABLES;)   
+* On Linux:   
+    * `sudo apt install mysql-server` python3-dev default-libmysqlclient-dev build-essential   
+    * 启动 MYSQL: sudo systemctl start mysql (WSL2: `sudo service mysql start`)
+    * 查看服务器状态：sudo service mysql status
+    * sudo mysql_secure_installation
+    <!-- * sudo systemctl enable mysql (WSL2: sudo update-rc.d mysql defaults) -->
+
+* On MacOS: 
     * brew install mysql
     * brew services start/stop mysql
     * mysql_secure_installation 
@@ -41,15 +49,34 @@ This project has built two REST APIs:
     Windows系统中如这一步失败，可能需安装 'sudo apt install default-libmysqlclient-dev'  
     
 3. 将 "settings.py" DATABASES 替换为 MYSQL    
-    注意在WSL2系统中的localhost地址不同   
+    注意若 MySQL 与 django 在同一环境中，则为localhost; 但若 MySQL 安装在 Windows 而 django 在WSL2系统中，localhost地址不同   
     
 
 4. Declare models in models.py, and perform makemigrations & migrations. The corresponding tables will be created in the database (which can be confirmed by CLI or vscode extensions).
 
 5. Import models in admin.py; Register the newly created models with the admin site using the `admin.site.register()`
 
-Optionally: Create superuser with `python manage.py createsuperuser`; add data using the admin interface
+Optionally: Create superuser with `python3 manage.py createsuperuser`; add data using the admin interface
 
+---
+
+Trouble-shooting:
+* Test Database Connection: `python3 manage.py dbshell`   
+    * 需注意：检查 mysqld.cnf (例如socket, bind-address)    
+        ```
+        [mysqld]
+        user = mysql
+        socket = /var/run/mysqld/mysqld.sock
+        bind-address = 0.0.0.0
+        ```
+* 如果MySQL用户目录不存在：
+    ```
+    sudo service mysql stop
+    sudo usermod -d /var/lib/mysql mysql
+    sudo service mysql start
+    ```
+
+---
 
 ### Build REST APIs
 
@@ -72,7 +99,7 @@ Optionally: Create superuser with `python manage.py createsuperuser`; add data u
 2. Add `rest_framework` to INSTALLED_APPS in "settings.py". 
 
 
-3. Create **"serializers.py"** file in the app folder (from rest_framework import serializers).     
+3. Create **"serializers.py"** file in the app folder (`from rest_framework import serializers`).     
     Also need to import models.     
 
 
@@ -85,6 +112,69 @@ Optionally: Create superuser with `python manage.py createsuperuser`; add data u
     注意project下的urls.py，相当于 url dispatcher，可以 include('my_app.urls')
 
 <br>
+
+### User Authentication
+
+#### djoser
+
+* session-based authentication
+* token-based authentication: djoser (DRF's TokenAuthentication)
+
+Modify credentials within admin interface:
+
+1. pip3 install djoser
+
+2. In settings.py, include:
+    ```
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+        'rest_framework.authtoken',
+        'djoser',
+        ...
+    ]
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+        ),
+    }
+
+    DJOSER = {
+        "USER_ID_FIELD": "username"
+    }
+    ```
+
+<!-- admin.py:
+
+    ```
+    from django.contrib import admin
+    from rest_framework.authtoken.models import Token
+    admin.site.register(Token)
+    ``` -->
+
+2. Enable djoser endpoints by adding the following URL routes in the project's URL patterns.    
+    ```
+    #add following lines to update urlpatterns list
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken'))
+    ```
+
+3. Run server and go to http://127.0.0.1:8000/auth/token/login, use user name and password to generate a token.
+
+
+#### Restrict a view only for authenticated users
+
+Modify credentials outside the app:
+
+1. Add the 'rest_framework.authtoken' app to the list of INSTALLED_APPS in the settings.py file
+2. In views.py, 'from rest_framework.permissions import IsAuthenticated'. Secure a view by adding `permission_classes = [IsAuthenticated]`
+3. In the app's url, 'from rest_framework.authtoken.views import obtain_auth_token', and add a new route p'ath('api-token-auth/', obtain_auth_token)'.
+4. Use insomnia Post method (or just use curl -x POST) to send username and password to the url 'api-token-auth/'.   
+To get the response from a secured URL, select the Auth tab in Insomnia, choose the Bearer token from the drop down, and enter the token generated in the previous step and then press the send button.
+
+
 
 ## Troubleshooting
 
@@ -102,7 +192,7 @@ FLUSH PRIVILEGES;
 bind-address = 192.168.16.1
 ```
 
-Use `cat /etc/resolv.conf | grep nameserver` to find the IP address of your Windows host (eg. 192.168.16.1).  
+Use `cat /etc/resolv.conf | grep nameserver` (ip addr | grep eth0) to find the IP address of your Windows host (eg. 192.168.16.1).  
 Otherwise, you can also use the wild card '%', and change bind-address to 0.0.0.0.  
 
 But MySQL does not support specifying multiple bind-address values directly in the configuration file. But you can set the bind-address to 0.0.0.0, and use firewall rules to restrict access to specific IP addresses.
