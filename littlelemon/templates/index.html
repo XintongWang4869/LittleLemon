@@ -1,15 +1,41 @@
-<!--add this template tag-->
 {% load static %}
-<img src="{% static 'restaurant/littlelemon.jpg' %}">
-
 <html>
 
 <head>
-    <title>Capstone Project</title>
+    <title>Little Lemon</title>
+    <style>
+        .container {
+            position: relative;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            color: white;
+        }
+
+        .container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .title-text {
+            text-align: center;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3vw;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+    </style>
 </head>
 
 <body>
-    <h1 style="text-align:center;">Welcome To LittleLemon Restaurant</h1>
+    <div class="container">
+        <img src="{% static 'restaurant/littlelemon.jpg' %}" alt="Little Lemon Restaurant">
+        <div class="title-text">Welcome To Little Lemon!</div>
+    </div>
 </body>
 
 </html>

@@ -1,16 +1,7 @@
 
+# Step-by-Step Guide
 
-This project has built two REST APIs:
-
-* The Menu API: used to display food items for ordering
-* the Table booking API: used to facilitate reserving a table for dining in the restaurant on a specific date and for a certain number of people.
-
-
-
-
-## Step-by-Step Guide
-
-### Initial Setup
+## Initial Setup
 
 1. Create a remote repo, **without** initialing any files.
 
@@ -30,7 +21,7 @@ This project has built two REST APIs:
 
 <br>
 
-### Declare Models (Using MySQL)
+## Declare Models (Using MySQL)
 
 1. Install MySQL
 
@@ -63,7 +54,7 @@ This project has built two REST APIs:
 
 <br>
 
-### Build REST APIs
+## Build REST APIs
 
 1. `pip3 install djangorestframework`
 
@@ -98,7 +89,7 @@ This project has built two REST APIs:
 
 <br>
 
-### User Authentication
+## User Authentication
 
 * Session-based authentication
 * Token-based authentication
@@ -108,7 +99,7 @@ This project has built two REST APIs:
 * Basic authentication: only for development stage
 
 
-#### djoser
+### djoser
 
 
 Modify credentials within admin interface:
@@ -120,7 +111,7 @@ Modify credentials within admin interface:
     INSTALLED_APPS = [
         ...
         'rest_framework',
-        'rest_framework.authtoken',  # this line is important
+        'rest_framework.authtoken',   # this line is important
         'djoser',
         ...
     ]
@@ -154,15 +145,15 @@ Modify credentials within admin interface:
 3. Run server and go to http://127.0.0.1:8000/auth/token/login. Use user name and password to generate a token.
 
 
-#### Restrict a view only for authenticated users
+### Restrict a view only for authenticated users
 
 Modify credentials outside the app:
 
 1. Add the `rest_framework.authtoken` app to the list of INSTALLED_APPS in the "settings.py" file
 2. In views.py, add 'from rest_framework.permissions import IsAuthenticated'. Secure a view by adding `permission_classes = [IsAuthenticated]`
 3. In the app's "urls.py", add `from rest_framework.authtoken.views import obtain_auth_token`, and add a new route `path('api-token-auth/', obtain_auth_token)`.
-4. Use **Insomnia** Post method (or just use curl -x POST) to send username and password to the url 'api-token-auth/'.   
-To get the response from a secured URL, select the Auth tab in Insomnia, choose the Bearer token from the drop down, and enter the token generated in the previous step and then press the send button.
+4. Use **Insomnia** Post method (or just use curl -x POST) to send username and password to the url 'your_app/api-token-auth/', which will then return a token.        
+To get the response from a secured URL, select the Auth tab in Insomnia, choose Bearer Token and enter the token generated in the previous step, enter "Token" in the prefix, and then press the send button.
 
 > To enforce authentication on a Django view:   
 > * @permission_classes([IsAuthenticated])
@@ -183,7 +174,7 @@ REST_FRAMEWORK = {
 <br>
 
 
-## Testing
+# Testing
 
 Main library: `from django.test import TestCase` 
 
@@ -191,7 +182,7 @@ Command: `python3 manage.py test`
 
 Location of test files:
 * A single 'test.py' file containing all the test functions, located in the app folder.
-* A ['tests'](/littlelemon/littlelemon/tests/) folder containing separated 'test_xxx.py' files, located in the project-level folder.
+* A ['tests'](./littlelemon/littlelemon/tests/) folder containing separated 'test_xxx.py' files, located in the project-level folder.
 
 How to test models:
 1. Import TestCase and your model. Use TestCase as a base and declare a test class.
@@ -213,7 +204,7 @@ Testing with Insomnia:
 <br>
 
 
-## Troubleshooting
+# Troubleshooting
 
 
 **Problem: Fail to connect MySQL with django project**
@@ -249,7 +240,7 @@ Testing with Insomnia:
     > Use `cat /etc/resolv.conf | grep nameserver` to find out your IP of the host Windows system (eg. 192.168.16.1).  
     Otherwise, you can also use the wild card '%', and change bind-address to 0.0.0.0 to allow connections from any IP address.
 
-* In MYSQL configuration file (/etc/mysql/my.cnf):
+* In MYSQL configuration file (./etc/mysql/my.cnf):
     ```
     [mysqld]
     bind-address = your_addr
