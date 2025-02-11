@@ -2,7 +2,7 @@
 
 This project has built two REST APIs:
 
-* The Menu API: used to order food 
+* The Menu API: used to display food items for ordering
 * the Table booking API: used to facilitate reserving a table for dining in the restaurant on a specific date and for a certain number of people.
 
 
@@ -12,31 +12,34 @@ This project has built two REST APIs:
 
 ### Initial Setup
 
-1. 创建remote repo
+1. Create a remote repo, **without** initialing any files.
 
-2. 创建并进入虚拟环境，安装 `django-admin`
+2. In the local folder, create files such as README.md, .gitignore. Make initial commit.   
+    Add remote repo origin, and push.
+
+3. Create a virtual environment and activate the venv. Install `django-admin`
 
 
-3. 创建project: `django-admin startproject littlelemon .`  
-    查看是否正常运行 cd littlelemon && python3 manage.py runserver.
+4. Create a django project: `django-admin startproject littlelemon .`   
+    Check if it can run successfully: cd littlelemon && python3 manage.py runserver.
 
-4. 在project中创建app: `python3 manage.py startapp restaurant`.   
+5. Create an app in the project: `python3 manage.py startapp restaurant`.   
     Add the app to **INSTALLED_APPS** in "settings.py".  
 
-5. Commit and push to git repo.
+6. Add, commit and push changes to git repo.
 
+<br>
 
-### Declare Models
+### Declare Models (Using MySQL)
 
 1. Install MySQL
 
 * On Windows, download [MySQL](https://www.mysql.com/downloads/). Use MYSQL Workbench to start running a local instance. Start MYSQL CLI client to check the running instance (Commonly used commands: SHOW DATABASES; CREATE DATABASE USE database_name; USE database_name; SHOW TABLES;)   
 * On Linux:   
     * `sudo apt install mysql-server` python3-dev default-libmysqlclient-dev build-essential   
-    * 启动 MYSQL: sudo systemctl start mysql (WSL2: `sudo service mysql start`)
-    * 查看服务器状态：sudo service mysql status
-    * sudo mysql_secure_installation
-    <!-- * sudo systemctl enable mysql (WSL2: sudo update-rc.d mysql defaults) -->
+    * Start MYSQL: sudo systemctl start mysql (WSL2: `sudo service mysql start`)
+    * Check server status：`sudo service mysql status`
+    * `sudo mysql_secure_installation`
 
 * On MacOS: 
     * brew install mysql
@@ -45,38 +48,20 @@ This project has built two REST APIs:
     * mysql -u root -p (log in to MySQL as the root user)
 
 
-2. 在项目的虚拟环境中，`pip3 install mysqlclient`.      
-    Windows系统中如这一步失败，可能需安装 'sudo apt install default-libmysqlclient-dev'  
+2. In venv，`pip3 install mysqlclient`.      
+    On Windows, if this step fails, you may run 'sudo apt install default-libmysqlclient-dev'  
     
-3. 将 "settings.py" DATABASES 替换为 MYSQL    
-    注意若 MySQL 与 django 在同一环境中，则为localhost; 但若 MySQL 安装在 Windows 而 django 在WSL2系统中，localhost地址不同   
+3. In **"settings.py"**, replace DATABASES with MYSQL.    
+    Note that if MySQL and django are in the same environment，then 'HOST' is 'localhost'; If MySQL is installed on Windows whereas django is in WSL2，see [Troubleshooting section](#troubleshooting).
     
 
-4. Declare models in models.py, and perform makemigrations & migrations. The corresponding tables will be created in the database (which can be confirmed by CLI or vscode extensions).
+4. Declare models in **"models.py"**, and perform makemigrations & migrations. The corresponding tables will be created in the database (which can be confirmed by CLI or vscode extensions).
 
-5. Import models in admin.py; Register the newly created models with the admin site using the `admin.site.register()`
+5. Import models in **"admin.py"**, and register the newly created models with the admin site using the `admin.site.register()`.
 
-Optionally: Create superuser with `python3 manage.py createsuperuser`; add data using the admin interface
+6. Create superuser with `python3 manage.py createsuperuser`. Optionally, populate some data using the admin interface.
 
----
-
-Trouble-shooting:
-* Test Database Connection: `python3 manage.py dbshell`   
-    * 需注意：检查 mysqld.cnf (例如socket, bind-address)    
-        ```
-        [mysqld]
-        user = mysql
-        socket = /var/run/mysqld/mysqld.sock
-        bind-address = 0.0.0.0
-        ```
-* 如果MySQL用户目录不存在：
-    ```
-    sudo service mysql stop
-    sudo usermod -d /var/lib/mysql mysql
-    sudo service mysql start
-    ```
-
----
+<br>
 
 ### Build REST APIs
 
@@ -85,7 +70,7 @@ Trouble-shooting:
 > **Django REST Framework (DRF)** serializes the view response into JSON format and returns it to the client.  
 > _Serialization_ involves converting the model instances (complex data) to native Python datatypes (JSON or XML) so that they can be rendered into JSON format.  
 > _Deserialization_ parses the data back into the model instance after first validating the incoming data.  
-> DRF views:    
+> DRF views include:    
 > * function-based views:   
 >    * Need to provide separate views for each method such as GET, POST, PUT and DELETE.
 > * class-based views   
@@ -103,24 +88,24 @@ Trouble-shooting:
     Also need to import models.     
 
 
-4. Develop views for the API in **views.py**: using class-based views here as example.      
+4. Develop views for the API in **views.py**.      
     * For function-based views: return render(request, template, {context}) 
-    * For viewsets/generics: 需定义 **queryset** (指定了视图将操作的model对象集) 如 User.objects.all()，同时也需定义上一步的 **serializer_class**
+    * For viewsets/generics: provide queryset (which determines the collection of target model instances, eg. User.objects.all()). Also provide **serializer_class** defined in the previous step.
     
 
 5. Update the URL configuration of the app as well as the project.      
-    注意project下的urls.py，相当于 url dispatcher，可以 include('my_app.urls')
+    Note that the project-level "urls.py", serves as url dispatcher. You can use include('my_app.urls')
 
 <br>
 
 ### User Authentication
 
-* session-based authentication
-* token-based authentication
-    * a secure and scalable way to handle user authentication across different devices and platforms. It typically uses JSON Web Tokens (JWTs) or OAuth tokens, which can be easily passed between the client and server. 
+* Session-based authentication
+* Token-based authentication
+    * It is a secure and scalable way to handle user authentication across different devices and platforms. It typically uses JSON Web Tokens (JWTs) or OAuth tokens, which can be easily passed between the client and server. 
     * **JWT (JSON Web Token)**: self-contained and stateless. Commonly used for API authentication, single sign-on (SSO), and cross-domain authentication.
     * djoser (DRF's TokenAuthentication): can also perform JSON Web authentication
-* basic authentication: only for development stage
+* Basic authentication: only for development stage
 
 
 #### djoser
@@ -128,14 +113,14 @@ Trouble-shooting:
 
 Modify credentials within admin interface:
 
-1. pip3 install djoser
+1. `pip3 install djoser`
 
-2. In settings.py, include:
+2. In "settings.py", include:
     ```
     INSTALLED_APPS = [
         ...
         'rest_framework',
-        'rest_framework.authtoken',  # 这一步尤为重要
+        'rest_framework.authtoken',  # this line is important
         'djoser',
         ...
     ]
@@ -152,7 +137,7 @@ Modify credentials within admin interface:
     }
     ```
 
-<!-- admin.py:
+<!-- "admin.py":
 
     ```
     from django.contrib import admin
@@ -166,23 +151,23 @@ Modify credentials within admin interface:
     path('auth/', include('djoser.urls.authtoken'))
     ```
 
-3. Run server and go to http://127.0.0.1:8000/auth/token/login, use user name and password to generate a token.
+3. Run server and go to http://127.0.0.1:8000/auth/token/login. Use user name and password to generate a token.
 
 
 #### Restrict a view only for authenticated users
 
 Modify credentials outside the app:
 
-1. Add the 'rest_framework.authtoken' app to the list of INSTALLED_APPS in the settings.py file
-2. In views.py, 'from rest_framework.permissions import IsAuthenticated'. Secure a view by adding `permission_classes = [IsAuthenticated]`
-3. In the app's url, 'from rest_framework.authtoken.views import obtain_auth_token', and add a new route p'ath('api-token-auth/', obtain_auth_token)'.
-4. Use insomnia Post method (or just use curl -x POST) to send username and password to the url 'api-token-auth/'.   
+1. Add the `rest_framework.authtoken` app to the list of INSTALLED_APPS in the "settings.py" file
+2. In views.py, add 'from rest_framework.permissions import IsAuthenticated'. Secure a view by adding `permission_classes = [IsAuthenticated]`
+3. In the app's "urls.py", add `from rest_framework.authtoken.views import obtain_auth_token`, and add a new route `path('api-token-auth/', obtain_auth_token)`.
+4. Use **Insomnia** Post method (or just use curl -x POST) to send username and password to the url 'api-token-auth/'.   
 To get the response from a secured URL, select the Auth tab in Insomnia, choose the Bearer token from the drop down, and enter the token generated in the previous step and then press the send button.
 
 > To enforce authentication on a Django view:   
 > * @permission_classes([IsAuthenticated])
 > * permission_classes = [IsAuthenticated]  
-> * In settings.py file, you can set DEFAULT_PERMISSION_CLASSES to apply authentication globally:
+> * In "settings.py" file, you can set DEFAULT_PERMISSION_CLASSES to apply authentication globally:
 ```
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -220,14 +205,38 @@ How to test views:
 3. Get items from the model and serialize them.
 4. Compare the response and serializer data.
 
+Testing with Insomnia:
+* Design: design API specification documents
+* Test: write the unit tests
+* Debug: where you visit the endpoints of your API and test the responses
+
 <br>
 
 
 ## Troubleshooting
 
 
+**Problem: Fail to connect MySQL with django project**
 
-Problem: MySQL installed in windows whereas django project is in wsl2
+* Quick test database connection: `python3 manage.py dbshell`   
+* Check "mysqld.cnf" (eg. socket, bind-address information). An exmaple configuration is as follows:    
+    ```
+    [mysqld]
+    user = mysql
+    socket = /var/run/mysqld/mysqld.sock
+    bind-address = 0.0.0.0
+    ```
+* If MySQL user does not exist：
+    ```
+    sudo service mysql stop
+    sudo usermod -d /var/lib/mysql mysql
+    sudo service mysql start
+    ```
+
+
+
+
+**Problem: MySQL installed in windows whereas django project is in wsl2**
 
 
 * In MYSQL command line client:
