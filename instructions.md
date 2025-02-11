@@ -115,10 +115,16 @@ Trouble-shooting:
 
 ### User Authentication
 
+* session-based authentication
+* token-based authentication
+    * a secure and scalable way to handle user authentication across different devices and platforms. It typically uses JSON Web Tokens (JWTs) or OAuth tokens, which can be easily passed between the client and server. 
+    * **JWT (JSON Web Token)**: self-contained and stateless. Commonly used for API authentication, single sign-on (SSO), and cross-domain authentication.
+    * djoser (DRF's TokenAuthentication): can also perform JSON Web authentication
+* basic authentication: only for development stage
+
+
 #### djoser
 
-* session-based authentication
-* token-based authentication: djoser (DRF's TokenAuthentication)
 
 Modify credentials within admin interface:
 
@@ -129,7 +135,7 @@ Modify credentials within admin interface:
     INSTALLED_APPS = [
         ...
         'rest_framework',
-        'rest_framework.authtoken',
+        'rest_framework.authtoken',  # 这一步尤为重要
         'djoser',
         ...
     ]
@@ -156,7 +162,6 @@ Modify credentials within admin interface:
 
 2. Enable djoser endpoints by adding the following URL routes in the project's URL patterns.    
     ```
-    #add following lines to update urlpatterns list
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken'))
     ```
@@ -174,34 +179,80 @@ Modify credentials outside the app:
 4. Use insomnia Post method (or just use curl -x POST) to send username and password to the url 'api-token-auth/'.   
 To get the response from a secured URL, select the Auth tab in Insomnia, choose the Bearer token from the drop down, and enter the token generated in the previous step and then press the send button.
 
+> To enforce authentication on a Django view:   
+> * @permission_classes([IsAuthenticated])
+> * permission_classes = [IsAuthenticated]  
+> * In settings.py file, you can set DEFAULT_PERMISSION_CLASSES to apply authentication globally:
+```
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+```
+
+<br>
+
+
+## Testing
+
+Main library: `from django.test import TestCase` 
+
+Command: `python3 manage.py test`
+
+Location of test files:
+* A single 'test.py' file containing all the test functions, located in the app folder.
+* A ['tests'](/littlelemon/littlelemon/tests/) folder containing separated 'test_xxx.py' files, located in the project-level folder.
+
+How to test models:
+1. Import TestCase and your model. Use TestCase as a base and declare a test class.
+2. Create a model instance: Your_model.objects.create(id='10', title="IceCream")
+3. assertEqual()
+
+How to test views:
+1. Set up some data using `setUp()`.   
+    setUp() is called before each test method, so it ensures a consistent environment where each method accesses the same data.
+2. Get response from a view url.
+3. Get items from the model and serialize them.
+4. Compare the response and serializer data.
+
+<br>
 
 
 ## Troubleshooting
 
-MySQL installed in windows whereas django project is in wsl2 (**the following code is less secure**):
+
+
+Problem: MySQL installed in windows whereas django project is in wsl2
+
+
 * In MYSQL command line client:
-```
-CREATE USER 'root'@'192.168.16.1' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.16.1' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-```
+    ```
+    CREATE USER 'root'@'your_addr' IDENTIFIED BY 'your_password';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'your_addr' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;
+    ```
 
-* In MYSQL configuration file (/etc/mysql/my.cnf), set bind-address to 0.0.0.0 to allow connections from any IP address.
-```
-[mysqld]
-bind-address = 192.168.16.1
-```
+    > Use `cat /etc/resolv.conf | grep nameserver` to find out your IP of the host Windows system (eg. 192.168.16.1).  
+    Otherwise, you can also use the wild card '%', and change bind-address to 0.0.0.0 to allow connections from any IP address.
 
-Use `cat /etc/resolv.conf | grep nameserver` (ip addr | grep eth0) to find the IP address of your Windows host (eg. 192.168.16.1).  
-Otherwise, you can also use the wild card '%', and change bind-address to 0.0.0.0.  
-
-But MySQL does not support specifying multiple bind-address values directly in the configuration file. But you can set the bind-address to 0.0.0.0, and use firewall rules to restrict access to specific IP addresses.
+* In MYSQL configuration file (/etc/mysql/my.cnf):
+    ```
+    [mysqld]
+    bind-address = your_addr
+    ```
 
 
+    > Note that MySQL does not support specifying multiple bind-address values directly in the configuration file. You can set the bind-address to 0.0.0.0, and use firewall rules to restrict access to specific IP addresses.
 
-Revoke Privileges (otherwise they will remain in effect even after the MySQL server is shut down and restarted)
 
-```
-REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'root'@'%';
-FLUSH PRIVILEGES;
-```
+* Revoke privileges (otherwise they will remain in effect even after the MySQL server is shut down and restarted)
+
+    ```
+    REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'root'@'%';
+    FLUSH PRIVILEGES;
+    ```
