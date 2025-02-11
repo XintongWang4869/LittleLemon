@@ -20,38 +20,46 @@ Features:
 
 **Index page:** restaurant/
 
-<img src="demo/restaurant-idx-page.png" alt="Little Lemon" width="500px">
+<img src="demo/restaurant-idx-page.png" alt="Index page" width="500px">
 
 **Menu items:** restaurant/menu/
 
-<img src="demo/restaurant-menu-endpoint.png" alt="Little Lemon" width="500px">
+<img src="demo/restaurant-menu-endpoint.png" alt="restaurant/menu/" width="950px">
 
 **Booking endpoint:** restaurant/booking/
 
-<img src="demo/restaurant-booking-endpoint.png" alt="Little Lemon" width="500px">
+<img src="demo/restaurant-booking-endpoint.png" alt="restaurant/booking/" width="950px">
 
-**Booking information:** restaurant/booking/tables
+**Booking information:** restaurant/booking/tables/
 
-<img src="demo/restaurant-booking-tables-endpoint.png" alt="Little Lemon" width="500px">
+<img src="demo/restaurant-booking-tables-endpoint.png" alt="restaurant/booking/tables/" width="950px">
 
+<br>
 
 **Testing:**
 
 * Unit test     
-<img src="demo/unittest-passed.png" alt="Little Lemon" width="500px">
+<img src="demo/unittest-passed.png" alt="Unit tests" width="500px">
 
 * Insomnia   
-    * POST - add a new menu item    
-    <img src="demo/insomnia-test-menu-post.png" alt="Little Lemon" width="500px">
-    * GET - get menu items    
-    <img src="demo/insomnia-test-menu-get.png" alt="Little Lemon" width="500px">
-    * PUT - update an existing menu item    
-    <img src="demo/insomnia-test-menu-put.png" alt="Little Lemon" width="500px">
-    * Accessing a protected page without token    
-    <img src="demo/insomnia-without-token.png" alt="Little Lemon" width="500px">
-    * Accessing a protected page with token    
-    <img src="demo/insomnia-with-token.png" alt="Little Lemon" width="500px">
 
+    * POST - add a new menu item    
+    <img src="demo/insomnia-test-menu-post.png" alt="Menu POST" width="950px">
+
+    * GET - get menu items    
+    <img src="demo/insomnia-test-menu-get.png" alt="Menu GET" width="950px">
+
+    * PUT - update an existing menu item    
+    <img src="demo/insomnia-test-menu-put.png" alt="Menu PUT" width="950px">
+
+    * Accessing a protected page without token    
+    <img src="demo/insomnia-without-token.png" alt="o Token" width="950px">
+
+    * Accessing a protected page with token    
+    <img src="demo/insomnia-with-token.png" alt="w Token" width="950px">
+
+
+<br>
 
 ## Note
 
